@@ -2,6 +2,3 @@ echo "1.0.0" > version.txt
 git add version.txt
 git commit -m "Add version.txt with initial version"
 git push
-
-
-
