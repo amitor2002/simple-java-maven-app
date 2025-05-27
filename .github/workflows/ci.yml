@@ -21,6 +21,7 @@ jobs:
       - name: Bump patch version
         id: bump_version
         run: |
+          echo "Current: $VERSION, Major: $MAJOR, Minor: $MINOR, Patch: $PATCH"
           VERSION=$(cat version.txt)
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           PATCH=$((PATCH + 1))
