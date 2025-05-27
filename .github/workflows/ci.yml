@@ -21,12 +21,24 @@ jobs:
       - name: Bump patch version
         id: bump_version
         run: |
+          git pull origin main
           VERSION=$(cat version.txt)
+          echo "Current version: $VERSION"
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           PATCH=$((PATCH + 1))
           NEW_VERSION="$MAJOR.$MINOR.$PATCH"
           echo "$NEW_VERSION" > version.txt
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+        - name: Commit and push new version
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: |
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git add version.txt
+            git commit -m "Bump version to ${{ steps.bump_version.outputs.version }}" || echo "No changes to commit"
+            git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main
 
       - name: Build Docker image
         run: |
@@ -44,12 +56,4 @@ jobs:
           docker tag $IMAGE_NAME:$VERSION ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$VERSION
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$VERSION
 
-      - name: Commit and push new version
-        env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add version.txt
-          git commit -m "Bump version to ${{ steps.bump_version.outputs.version }}" || echo "No changes to commit"
-          git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main
+      
