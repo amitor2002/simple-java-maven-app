@@ -9,8 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      -name: Debug remote
-       run: git remote -v 
+      - name: Debug remote
+        run: git remote -v
+
       - name: Checkout code
         uses: actions/checkout@v3
 
